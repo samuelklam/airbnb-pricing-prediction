@@ -1,4 +1,4 @@
 **/.ipynb_checkpoints
 datasets/
-!datasets/listings.csv
+!datasets/raw_datasets/listings.csv
 !listings_clean.csv
