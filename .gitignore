@@ -3,3 +3,4 @@ datasets/raw_datasets/*
 !datasets/raw_datasets/listings.csv
 !listings_clean.csv
 .DS_Store
+/public/npm-debug.log
