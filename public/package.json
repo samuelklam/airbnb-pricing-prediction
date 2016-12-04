@@ -2,11 +2,10 @@
   "name": "Airbnb-Pricing-Prediction",
   "title": "Airbnb Pricing Prediction",
   "version": "3.3.7+1",
-  "homepage": "http://startbootstrap.com/template-overviews/clean-blog",
-  "author": "Start Bootstrap",
+  "homepage": "https://airbnb-pricing-prediction.herokuapp.com/index.html",
+  "author": "Samuel Lam",
   "license": {
-    "type": "MIT",
-    "url": "https://github.com/BlackrockDigital/startbootstrap/blob/gh-pages/LICENSE"
+    "type": "MIT"
   },
   "devDependencies": {
     "bootstrap": "^3.3.7",
@@ -22,7 +21,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/BlackrockDigital/startbootstrap-clean-blog.git"
+    "url": "https://github.com/samuelklam/airbnb-pricing-prediction"
   },
   "dependencies": {
     "express": "^4.14.0"
