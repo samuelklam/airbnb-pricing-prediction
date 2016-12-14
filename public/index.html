@@ -66,9 +66,9 @@
                 <tr>
                     <td class="custom-form-control">Site Navigation:
                         <select id="topnav" class="custom-form-control" onchange="includeContent(this.options[this.selectedIndex].value);document.getElementById('botnav').options[this.options.selectedIndex].selected = true;">
-                            <option value="jupyter-notebooks/data-cleaning-listing.html">Overview</option>
-                            <option value="jupyter-notebooks/database.html">1. Data Cleaning</option>
-                            <option value="jupyter-notebooks/ScrapingCollegedata_MultipleRender.html">2. Data Exploration</option>
+                            <option value="jupyter-notebooks/data-cleaning-listings.html">Overview</option>
+                            <option value="jupyter-notebooks/data-cleaning-listings.html">1. Data Cleaning</option>
+                            <option value="jupyter-notebooks/data-exploration-listings.html">2. Data Exploration</option>
                             <option value="normalize.html">3. Data Modeling</option>
                             <option value="EDA.html">4. Conclusion and Future Work</option>
                             <option value="classification_v2.html">5. Appendix and References</option>
@@ -81,14 +81,17 @@
 
     <div id="includedContent"></div>
 
+    <br>
+    <br>
+
     <form>
         <table class="table">
             <tbody>
                 <tr>
                     <td class="custom-form-control">Site Navigation:
                         <select id="botnav" class="custom-form-control" onchange="includeContent(this.options[this.selectedIndex].value);document.getElementById('topnav').options[this.options.selectedIndex].selected = true;">
-                            <option value="jupyter-notebooks/data-cleaning-listing.html">Overview</option>
-                            <option value="jupyter-notebooks/database.html">1. Data Cleaning</option>
+                            <option value="jupyter-notebooks/data-cleaning-listings.html">Overview</option>
+                            <option value="jupyter-notebooks/data-cleaning-listings.html">1. Data Cleaning</option>
                             <option value="jupyter-notebooks/ScrapingCollegedata_MultipleRender.html">2. Data Exploration</option>
                             <option value="normalize.html">3. Data Modeling</option>
                             <option value="EDA.html">4. Conclusion and Future Work</option>
