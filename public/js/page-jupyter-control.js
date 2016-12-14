@@ -7,6 +7,6 @@ $(function() {
     });
   }
   $(function() {
-    includeContent("juptyer-notebooks/data-cleaning-listing.html");
+    includeContent("jupyter-notebooks/data-cleaning-listing.html");
   });
 });
