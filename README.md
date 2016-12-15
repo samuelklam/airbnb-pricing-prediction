@@ -8,7 +8,7 @@ A Statistical Model to predict the optimal Airbnb Listing price in NYC given lis
 - [Text Analysis](http://data.beta.nyc/dataset/inside­airbnb­data/resource/8115833e­8a0e­4af6­8aed ­4d96a0ae0b73)
 
 ## Technologies Used
-- [Sci-kit learn](http://scikit-learn.org/stable)
+- [Scikit learn](http://scikit-learn.org/stable)
 - [Pandas](http://pandas.pydata.org/)
 - [Numpy](http://www.numpy.org/)
 - [Jupyter Notebook](http://jupyter.org/)

@@ -11751,23 +11751,16 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Zip-Code-Clustering">Zip Code Clustering<a class="anchor-link" href="#Zip-Code-Clustering">&#182;</a></h1>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>We take the same approach to cleaning the data as in our original version. We take zipcodes and cluster them into neighborhoods. This is better than using their listed neighborhoods because it allows us to set the neighborhoods, and zipcode is a somewhat more reliable category with fewer null values.</p>
+<h1 id="1C.-Data-Cleaning:-Zipcode-Clusterings">1C. Data Cleaning: Zipcode Clusterings<a class="anchor-link" href="#1C.-Data-Cleaning:-Zipcode-Clusterings">&#182;</a></h1><hr>
+
+<p>We take the same approach to cleaning the data as in our original version. We take zipcodes and cluster them into neighborhoods. This is better than using the original neighborhoods column as there were many missing values and non-uniform neighborhood names. By converting by cleaned zipcode, we can ensure that the clustering by neighborhoods is more accurate.</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[21]:</div>
+<div class="prompt input_prompt">In&nbsp;[1]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
@@ -11788,7 +11781,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[33]:</div>
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">cols</span> <span class="o">=</span> <span class="p">[</span>
@@ -11820,51 +11813,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[34]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># determine the number of missing entries in each column</span>
-<span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
-    <span class="k">print</span> <span class="n">col</span> <span class="o">+</span> <span class="s1">&#39;, Number of Missing Values:&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">col</span><span class="p">][</span><span class="n">data</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">isnull</span><span class="p">()])</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>id, Number of Missing Values: 0
-host_id, Number of Missing Values: 0
-zipcode, Number of Missing Values: 162
-property_type, Number of Missing Values: 6
-room_type, Number of Missing Values: 0
-accommodates, Number of Missing Values: 0
-bathrooms, Number of Missing Values: 463
-bedrooms, Number of Missing Values: 140
-beds, Number of Missing Values: 98
-bed_type, Number of Missing Values: 0
-price, Number of Missing Values: 0
-minimum_nights, Number of Missing Values: 0
-availability_30, Number of Missing Values: 0
-number_of_reviews, Number of Missing Values: 0
-review_scores_rating, Number of Missing Values: 8657
-host_listing_count, Number of Missing Values: 0
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[35]:</div>
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># remove NaN values from dataframe</span>
@@ -11890,7 +11839,7 @@ host_listing_count, Number of Missing Values: 0
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[36]:</div>
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># turn NaN scores with 0 reviews into &#39;No Reviews&#39;</span>
@@ -11908,7 +11857,7 @@ host_listing_count, Number of Missing Values: 0
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[37]:</div>
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># convert review_scores_rating into buckets</span>
@@ -11941,25 +11890,9 @@ host_listing_count, Number of Missing Values: 0
         <span class="k">return</span> <span class="s1">&#39;0-9&#39;</span>
     
 <span class="n">data</span><span class="p">[</span><span class="s1">&#39;review_scores_rating&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;review_scores_rating&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">convert_scores_buckets</span><span class="p">)</span>
-<span class="k">print</span> <span class="s1">&#39;Unique Values in the Column:&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;review_scores_rating&#39;</span><span class="p">])</span>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>Unique Values in the Column: [&#39;20-29&#39; &#39;30-39&#39; &#39;40-49&#39; &#39;50-59&#39; &#39;60-69&#39; &#39;70-79&#39; &#39;80-84&#39; &#39;85-89&#39; &#39;90-94&#39;
- &#39;95-100&#39; &#39;No Reviews&#39;]
-</pre>
-</div>
-</div>
-
 </div>
 </div>
 
@@ -11977,7 +11910,7 @@ host_listing_count, Number of Missing Values: 0
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[38]:</div>
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># convert zipcodes into neighbrohoods</span>
@@ -12180,7 +12113,6 @@ host_listing_count, Number of Missing Values: 0
     <span class="s1">&#39;11373&#39;</span><span class="p">:</span> <span class="s1">&#39;West Queens&#39;</span><span class="p">,</span>
     <span class="s1">&#39;11377&#39;</span><span class="p">:</span> <span class="s1">&#39;West Queens&#39;</span><span class="p">,</span>
     <span class="s1">&#39;11378&#39;</span><span class="p">:</span> <span class="s1">&#39;West Queens&#39;</span><span class="p">,</span>
-
 <span class="p">}</span>
 
 <span class="k">def</span> <span class="nf">convert_zips_hoods</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
@@ -12196,7 +12128,7 @@ host_listing_count, Number of Missing Values: 0
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[39]:</div>
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;zipcode&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
@@ -12209,7 +12141,7 @@ host_listing_count, Number of Missing Values: 0
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[40]:</div>
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># encode categorical variables</span>
@@ -12226,8 +12158,6 @@ host_listing_count, Number of Missing Values: 0
     <span class="n">room_dummies</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">),</span> <span class="n">bed_dummies</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">),</span> <span class="n">ratings_scores_dummies</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)),</span> \
     <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
-<span class="k">print</span> <span class="s1">&#39;Number of Columns:&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
-
 <span class="c1"># move target predictor &#39;price&#39; to the end of the dataframe</span>
 <span class="n">cols</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
 <span class="n">idx</span> <span class="o">=</span> <span class="n">cols</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;price&#39;</span><span class="p">)</span>
@@ -12239,24 +12169,10 @@ host_listing_count, Number of Missing Values: 0
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>Number of Columns: 90
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[41]:</div>
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># convert non-categorical variables to floats and standardize</span>
@@ -12281,7 +12197,7 @@ host_listing_count, Number of Missing Values: 0
 <div class="output">
 
 
-<div class="output_area"><div class="prompt output_prompt">Out[41]:</div>
+<div class="output_area"><div class="prompt output_prompt">Out[9]:</div>
 
 <div class="output_html rendered_html output_subarea output_execute_result">
 <div>
@@ -12464,7 +12380,7 @@ host_listing_count, Number of Missing Values: 0
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>This data set is different from the original because it now has neighborhood booleans as opposed to zipcode booleans.</p>
+<h4 id="Note:">Note:<a class="anchor-link" href="#Note:">&#182;</a></h4><p>This data set is different from the original because it now has neighborhood booleans as opposed to zipcode booleans.</p>
 
 </div>
 </div>

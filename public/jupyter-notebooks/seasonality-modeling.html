@@ -11767,34 +11767,32 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[13]:</div>
+<div class="prompt input_prompt">In&nbsp;[37]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">matplotlib</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="kn">as</span> <span class="nn">sb</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">matplotlib.cm</span> <span class="kn">as</span> <span class="nn">cmx</span>
 <span class="kn">import</span> <span class="nn">matplotlib.colors</span> <span class="kn">as</span> <span class="nn">colors</span>
-<span class="kn">import</span> <span class="nn">seaborn</span> <span class="kn">as</span> <span class="nn">sb</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">linear_model</span>
+<span class="kn">import</span> <span class="nn">sklearn.metrics</span> <span class="kn">as</span> <span class="nn">metrics</span>
+<span class="kn">from</span> <span class="nn">sklearn.grid_search</span> <span class="kn">import</span> <span class="n">GridSearchCV</span>
+<span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">preprocessing</span>
+<span class="kn">from</span> <span class="nn">sklearn.cross_validation</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">PolynomialFeatures</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LinearRegression</span> <span class="k">as</span> <span class="n">Lin_Reg</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">RidgeCV</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LassoCV</span>
+<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestRegressor</span>
+<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">GradientBoostingRegressor</span>
+<span class="kn">import</span> <span class="nn">pylab</span>
+<span class="kn">import</span> <span class="nn">scipy.stats</span> <span class="kn">as</span> <span class="nn">stats</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
 <span class="kn">import</span> <span class="nn">datetime</span> <span class="kn">as</span> <span class="nn">dt</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
-<span class="o">%</span><span class="k">matplotlib</span> inline
-</pre></div>
-
-</div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[2]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="c1">#Importing Datafile and converting to numbers</span>
-<span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;../datasets/calendar_clean.csv&#39;</span><span class="p">)</span>
-<span class="n">data</span><span class="p">[</span><span class="s1">&#39;new price&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;new price&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;$&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -11807,19 +11805,28 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Something we notice from the Seasonality data is that much of the average prices by listing actually dont fluctuate over time. This explains a lot of the  This is where we can see a lot of business appeal!</p>
+<h3 id="Process-Overview:">Process Overview:<a class="anchor-link" href="#Process-Overview:">&#182;</a></h3><p>The general idea behind this analysis is as follows: we aggregate prices by weekday for each listing. Then, we normalize each listing's price by the monday price to find an average multiplier for each listing for each day. Then, for each day we average across all listings to get a final average multiplier for each day. Lastly, we compare these predictions to a subset of the listings.</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[37]:</div>
+<div class="prompt input_prompt">In&nbsp;[21]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">7</span><span class="p">]:</span>
-    <span class="n">results_nona</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">results_nona</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">/</span><span class="n">results_nona</span><span class="p">[</span><span class="s1">&#39;Mon&#39;</span><span class="p">]</span>
-<span class="n">results_nona</span><span class="p">[</span><span class="s1">&#39;Mon&#39;</span><span class="p">]</span><span class="o">=</span> <span class="mi">1</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1">#Importing Datafile</span>
+<span class="n">results_nona</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;../datasets/seasonality_tomodel.csv&#39;</span><span class="p">)</span>
+<span class="n">results_multiplier</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;../datasets/seasonality_tomodel.csv&#39;</span><span class="p">)</span>
+<span class="n">b</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Mon&#39;</span><span class="p">,</span><span class="s1">&#39;Tue&#39;</span><span class="p">,</span><span class="s1">&#39;Wed&#39;</span><span class="p">,</span><span class="s1">&#39;Thu&#39;</span><span class="p">,</span><span class="s1">&#39;Fri&#39;</span><span class="p">,</span><span class="s1">&#39;Sat&#39;</span><span class="p">,</span><span class="s1">&#39;Sun&#39;</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">7</span><span class="p">]:</span>
+    <span class="n">results_multiplier</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">results_multiplier</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">/</span><span class="n">results_multiplier</span><span class="p">[</span><span class="s1">&#39;Mon&#39;</span><span class="p">]</span>
+<span class="n">results_multiplier</span><span class="p">[</span><span class="s1">&#39;Mon&#39;</span><span class="p">]</span><span class="o">=</span> <span class="mi">1</span>
+<span class="n">b</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Mon&#39;</span><span class="p">,</span><span class="s1">&#39;Tue&#39;</span><span class="p">,</span><span class="s1">&#39;Wed&#39;</span><span class="p">,</span><span class="s1">&#39;Thu&#39;</span><span class="p">,</span><span class="s1">&#39;Fri&#39;</span><span class="p">,</span><span class="s1">&#39;Sat&#39;</span><span class="p">,</span><span class="s1">&#39;Sun&#39;</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">7</span><span class="p">]:</span>
+    <span class="n">results_multiplier</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">results_multiplier</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">/</span><span class="n">results_multiplier</span><span class="p">[</span><span class="s1">&#39;Mon&#39;</span><span class="p">]</span>
+<span class="n">results_multiplier</span><span class="p">[</span><span class="s1">&#39;Mon&#39;</span><span class="p">]</span><span class="o">=</span> <span class="mi">1</span>
+<span class="n">results_multiplier</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -11830,30 +11837,110 @@ div#notebook {
 <div class="output">
 
 
-<div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_text output_error">
-<pre>
-<span class="ansi-red-intense-fg ansi-bold">---------------------------------------------------------------------------</span>
-<span class="ansi-red-intense-fg ansi-bold">NameError</span>                                 Traceback (most recent call last)
-<span class="ansi-green-intense-fg ansi-bold">&lt;ipython-input-37-2cbc9a899219&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span><span class="ansi-blue-intense-fg ansi-bold">()</span>
-<span class="ansi-green-fg">      1</span> <span class="ansi-green-intense-fg ansi-bold">for</span> i <span class="ansi-green-intense-fg ansi-bold">in</span> b<span class="ansi-yellow-intense-fg ansi-bold">[</span><span class="ansi-cyan-intense-fg ansi-bold">1</span><span class="ansi-yellow-intense-fg ansi-bold">:</span><span class="ansi-cyan-intense-fg ansi-bold">7</span><span class="ansi-yellow-intense-fg ansi-bold">]</span><span class="ansi-yellow-intense-fg ansi-bold">:</span>
-<span class="ansi-green-intense-fg ansi-bold">----&gt; 2</span><span class="ansi-yellow-intense-fg ansi-bold">     </span>results_nona<span class="ansi-yellow-intense-fg ansi-bold">[</span>i<span class="ansi-yellow-intense-fg ansi-bold">]</span> <span class="ansi-yellow-intense-fg ansi-bold">=</span> results_nona<span class="ansi-yellow-intense-fg ansi-bold">[</span>i<span class="ansi-yellow-intense-fg ansi-bold">]</span><span class="ansi-yellow-intense-fg ansi-bold">/</span>results_nona<span class="ansi-yellow-intense-fg ansi-bold">[</span><span class="ansi-blue-intense-fg ansi-bold">&#39;Mon&#39;</span><span class="ansi-yellow-intense-fg ansi-bold">]</span>
-<span class="ansi-green-fg">      3</span> results_nona<span class="ansi-yellow-intense-fg ansi-bold">[</span><span class="ansi-blue-intense-fg ansi-bold">&#39;Mon&#39;</span><span class="ansi-yellow-intense-fg ansi-bold">]</span><span class="ansi-yellow-intense-fg ansi-bold">=</span> <span class="ansi-cyan-intense-fg ansi-bold">1</span>
+<div class="output_area"><div class="prompt output_prompt">Out[21]:</div>
 
-<span class="ansi-red-intense-fg ansi-bold">NameError</span>: name &#39;results_nona&#39; is not defined</pre>
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Mon</th>
+      <th>Tue</th>
+      <th>Wed</th>
+      <th>Thu</th>
+      <th>Fri</th>
+      <th>Sat</th>
+      <th>Sun</th>
+      <th>listing_id</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>1.000000</td>
+      <td>1.000000</td>
+      <td>1.000000</td>
+      <td>1.000000</td>
+      <td>1.000000</td>
+      <td>1.00000</td>
+      <td>3604481.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>1.000000</td>
+      <td>1.000000</td>
+      <td>1.000000</td>
+      <td>1.000000</td>
+      <td>1.000000</td>
+      <td>1.00000</td>
+      <td>2949128.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1</td>
+      <td>0.991826</td>
+      <td>0.991826</td>
+      <td>0.999846</td>
+      <td>1.138965</td>
+      <td>1.138965</td>
+      <td>1.00000</td>
+      <td>4325397.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1</td>
+      <td>1.000000</td>
+      <td>1.000000</td>
+      <td>1.000000</td>
+      <td>1.000000</td>
+      <td>1.000000</td>
+      <td>1.00000</td>
+      <td>4325398.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1</td>
+      <td>0.991494</td>
+      <td>0.994952</td>
+      <td>1.004395</td>
+      <td>1.015027</td>
+      <td>1.011263</td>
+      <td>0.99895</td>
+      <td>3426149.0</td>
+    </tr>
+  </tbody>
+</table>
 </div>
+</div>
+
 </div>
 
 </div>
 </div>
 
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We see that the dataframe now contains a multiplier for each day of the week for each listing. Now we take an average for each day(averaging across all listings) to see an average multiplier value for each day</p>
+
+</div>
+</div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[160]:</div>
+<div class="prompt input_prompt">In&nbsp;[108]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">results_nona</span><span class="p">[</span><span class="s1">&#39;Sun&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">multiplier</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">index</span><span class="p">,</span><span class="n">i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">multiplier</span><span class="p">):</span>
+    <span class="n">multiplier</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="n">results_multiplier</span><span class="o">.</span><span class="n">mean</span><span class="p">()[</span><span class="n">i</span><span class="p">]</span>
+<span class="n">multiplier</span>
 </pre></div>
 
 </div>
@@ -11864,11 +11951,1339 @@ div#notebook {
 <div class="output">
 
 
-<div class="output_area"><div class="prompt output_prompt">Out[160]:</div>
+<div class="output_area"><div class="prompt output_prompt">Out[108]:</div>
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>1.0009269127770262</pre>
+<pre>{&#39;Fri&#39;: 1.0306309142782333,
+ &#39;Mon&#39;: 1.0,
+ &#39;Sat&#39;: 1.0306744793102525,
+ &#39;Sun&#39;: 1.0009269127770359,
+ &#39;Thu&#39;: 1.0003671343632679,
+ &#39;Tue&#39;: 0.99980071473169119,
+ &#39;Wed&#39;: 0.9998361380714712}</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[115]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt output_prompt">Out[115]:</div>
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>[&#39;Tue&#39;, &#39;Wed&#39;, &#39;Thu&#39;, &#39;Fri&#39;, &#39;Sat&#39;, &#39;Sun&#39;]</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The results are very much in line with what we saw earlier in our seasonality-exploration file. Monday and Tuesday see a slight dip in their prices(99.9%) while Friday and Saturday see a sizable increase in prices (103%). These are thus the numbers we will be using to apply seasonality to the averages from our previous models. Here, we apply it to RidgeCV the best one that we found.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Predicting-prices-using-our-seasonality-averages">Predicting prices using our seasonality averages<a class="anchor-link" href="#Predicting-prices-using-our-seasonality-averages">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Now, it is important to test the performance of the averages we arrived at</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[31]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1">#Reproducing the RidgeCV code from 3A</span>
+<span class="c1"># helper function for plotting residual plots</span>
+<span class="k">def</span> <span class="nf">plot_residual</span><span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">,</span> <span class="n">ax3</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">y_real</span><span class="p">,</span> <span class="n">line_label</span><span class="p">,</span> <span class="n">title</span><span class="p">):</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> 
+                <span class="n">y_real</span><span class="p">,</span> 
+                <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span>
+                <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span>
+                <span class="n">label</span><span class="o">=</span><span class="n">line_label</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Predicted Y&#39;</span><span class="p">)</span> 
+    <span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Real Y&#39;</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;best&#39;</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+
+    <span class="n">ax2</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span>
+                <span class="n">y_real</span> <span class="o">-</span> <span class="n">y_pred</span><span class="p">,</span> 
+                <span class="n">color</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">,</span>
+                <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span>
+                <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span>
+                <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Residual&#39;</span><span class="p">)</span>
+    <span class="n">ax2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Predicted Y&#39;</span><span class="p">)</span>
+    <span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Residual&#39;</span><span class="p">)</span>
+    
+    <span class="n">ax2</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;y=0&#39;</span><span class="p">)</span>
+
+    <span class="n">ax2</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;best&#39;</span><span class="p">)</span>
+    <span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Residual Plot&#39;</span><span class="p">)</span>
+    
+    <span class="n">ax3</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">y_real</span> <span class="o">-</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+    <span class="n">ax3</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Histogram of residual values&#39;</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">,</span> <span class="n">ax3</span>
+<span class="k">class</span> <span class="nc">model</span><span class="p">:</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_train</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_train</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_test</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_test</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_pred_train</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_pred_test</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">train_score</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_score</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">train_score_log</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_score_log</span> <span class="o">=</span> <span class="bp">None</span>
+    
+    <span class="k">def</span> <span class="nf">data_split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_train</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_test</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_train</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="n">test_size</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">score_reg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_score</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_score</span>
+    
+    <span class="k">def</span> <span class="nf">score_log</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">train_score_log</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">r2_score</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y_train</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y_pred_train</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_score_log</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">r2_score</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y_test</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y_pred_test</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_score_log</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_score_log</span>
+    
+    <span class="k">def</span> <span class="nf">data_frame_convert</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">df_train</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;y_pred&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_pred_train</span><span class="p">,</span> <span class="s1">&#39;y_real&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_train</span><span class="p">})</span>
+        <span class="n">df_test</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;y_pred_test&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_pred_test</span><span class="p">,</span> <span class="s1">&#39;y_real_test&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_test</span><span class="p">})</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_score</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_score</span><span class="p">,</span> <span class="n">df_train</span><span class="p">,</span> <span class="n">df_test</span>
+
+    <span class="k">def</span> <span class="nf">data_frame_convert_log</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">df_train</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;y_pred&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y_pred_train</span><span class="p">),</span> <span class="s1">&#39;y_real&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y_train</span><span class="p">)})</span>
+        <span class="n">df_test</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;y_pred_test&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y_pred_test</span><span class="p">),</span> <span class="s1">&#39;y_real_test&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y_test</span><span class="p">)})</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_score_log</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_score_log</span><span class="p">,</span> <span class="n">df_train</span><span class="p">,</span> <span class="n">df_test</span>
+    
+    <span class="k">def</span> <span class="nf">fit_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_split</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_train</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_train</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">train_score</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_train</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_train</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_score</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_test</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_test</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_pred_train</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_train</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_pred_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_test</span><span class="p">)</span>
+    
+<span class="k">def</span> <span class="nf">model_iterations</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">model_arg</span><span class="p">,</span> <span class="n">log_bool</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="n">training_scores</span> <span class="o">=</span> <span class="p">[</span><span class="bp">None</span><span class="p">]</span><span class="o">*</span><span class="n">n</span>
+    <span class="n">testing_scores</span> <span class="o">=</span> <span class="p">[</span><span class="bp">None</span><span class="p">]</span><span class="o">*</span><span class="n">n</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">new_model</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">model_arg</span><span class="p">)</span>
+        <span class="n">new_model</span><span class="o">.</span><span class="n">fit_model</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">)</span>
+        <span class="n">training_scores</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">testing_scores</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_model</span><span class="o">.</span><span class="n">score_reg</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">log_bool</span> <span class="k">else</span> <span class="n">new_model</span><span class="o">.</span><span class="n">score_log</span><span class="p">()</span>
+
+    <span class="k">print</span> <span class="s1">&#39;Mean Train Score:&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">training_scores</span><span class="p">)</span>
+    <span class="k">print</span> <span class="s1">&#39;Mean Test Score:&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">testing_scores</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">new_model</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[32]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="k">def</span> <span class="nf">median_absolute_errors</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">log_bool</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="n">reg_params</span> <span class="o">=</span> <span class="mf">10.</span><span class="o">**</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+    <span class="n">models</span> <span class="o">=</span> <span class="p">[</span> <span class="n">RidgeCV</span><span class="p">(</span><span class="n">alphas</span><span class="o">=</span><span class="n">reg_params</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="mi">5</span><span class="p">)]</span>
+    <span class="n">model_labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span> <span class="s1">&#39;RidgeCV&#39;</span><span class="p">])</span>
+    <span class="n">model_errors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+
+    <span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.35</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">models</span><span class="p">:</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">log_bool</span><span class="p">:</span>
+            <span class="n">model_err</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">median_absolute_error</span><span class="p">((</span><span class="n">y_test</span><span class="p">),</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">))</span>
+            <span class="n">model_errors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">model_errors</span><span class="p">,</span> <span class="n">model_err</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">model_err</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">median_absolute_error</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">y_test</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)))</span>
+            <span class="n">model_errors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">model_errors</span><span class="p">,</span> <span class="n">model_err</span><span class="p">)</span>
+    
+    <span class="n">model_position</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">model_errors</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">models_sorted</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">model_errors</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">model</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">model_labels</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s1">&#39;Model {} Results: {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">model_labels</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">model_errors</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">model_position</span><span class="p">,</span> <span class="n">model_errors</span><span class="p">[</span><span class="n">models_sorted</span><span class="p">],</span> <span class="n">align</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">model_position</span><span class="p">,</span> <span class="n">model_labels</span><span class="p">[</span><span class="n">models_sorted</span><span class="p">])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Estimator&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Median Absolute Error&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[33]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;../datasets/listings_clean.csv&#39;</span><span class="p">)</span>
+<span class="n">data</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<span class="c1"># split into x and y (note that we do not include id and host_id as predictors)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">y_log</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[44]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">data</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt output_prompt">Out[44]:</div>
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>id</th>
+      <th>host_id</th>
+      <th>accommodates</th>
+      <th>bathrooms</th>
+      <th>bedrooms</th>
+      <th>beds</th>
+      <th>minimum_nights</th>
+      <th>availability_30</th>
+      <th>number_of_reviews</th>
+      <th>host_listing_count</th>
+      <th>...</th>
+      <th>50-59</th>
+      <th>60-69</th>
+      <th>70-79</th>
+      <th>80-84</th>
+      <th>85-89</th>
+      <th>90-94</th>
+      <th>95-100</th>
+      <th>No Reviews</th>
+      <th>price</th>
+      <th>price_log</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1069266</td>
+      <td>5867023</td>
+      <td>-0.520266</td>
+      <td>-0.331542</td>
+      <td>-0.407402</td>
+      <td>-0.493039</td>
+      <td>0.173906</td>
+      <td>0.390393</td>
+      <td>2.716107</td>
+      <td>-0.355961</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>160.0</td>
+      <td>5.075174</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2061725</td>
+      <td>4601412</td>
+      <td>-0.520266</td>
+      <td>-0.331542</td>
+      <td>-0.407402</td>
+      <td>0.381672</td>
+      <td>0.173906</td>
+      <td>-0.965897</td>
+      <td>1.295605</td>
+      <td>0.933455</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>58.0</td>
+      <td>4.060443</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>44974</td>
+      <td>198425</td>
+      <td>-0.520266</td>
+      <td>-0.331542</td>
+      <td>-0.407402</td>
+      <td>-0.493039</td>
+      <td>2.889531</td>
+      <td>-1.205242</td>
+      <td>0.822104</td>
+      <td>-0.355961</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>185.0</td>
+      <td>5.220356</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4701675</td>
+      <td>22590025</td>
+      <td>-0.520266</td>
+      <td>-0.331542</td>
+      <td>-0.407402</td>
+      <td>0.381672</td>
+      <td>-0.601986</td>
+      <td>1.108429</td>
+      <td>-0.493176</td>
+      <td>-0.355961</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>195.0</td>
+      <td>5.273000</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>68914</td>
+      <td>343302</td>
+      <td>1.690892</td>
+      <td>-0.331542</td>
+      <td>1.266328</td>
+      <td>1.256383</td>
+      <td>-0.214040</td>
+      <td>-0.407424</td>
+      <td>0.295992</td>
+      <td>0.073844</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>165.0</td>
+      <td>5.105945</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 226 columns</p>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[73]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">reg_params</span> <span class="o">=</span> <span class="mf">10.</span><span class="o">**</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">RidgeCV_model</span> <span class="o">=</span> <span class="n">RidgeCV</span><span class="p">(</span><span class="n">alphas</span><span class="o">=</span><span class="n">reg_params</span><span class="p">,</span> <span class="n">fit_intercept</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[74]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">RidgeCV_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y_log</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt output_prompt">Out[74]:</div>
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>RidgeCV(alphas=array([  1.00000e-10,   4.64159e-09,   2.15443e-07,   1.00000e-05,
+         4.64159e-04,   2.15443e-02,   1.00000e+00,   4.64159e+01,
+         2.15443e+03,   1.00000e+05]),
+    cv=5, fit_intercept=True, gcv_mode=None, normalize=False, scoring=None,
+    store_cv_values=False)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[168]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">sample</span> <span class="o">=</span> <span class="n">results_nona</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">frac</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="nb">len</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt output_prompt">Out[168]:</div>
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>1092</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[169]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># some of the id&#39;s in the sample can&#39;t be found. So at the end we readjust the sample dataframe too so they have the same entries</span>
+<span class="n">sample_variables</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="s1">&#39;listing_id&#39;</span><span class="p">])]</span>
+<span class="n">sample_variables</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">sample_variables</span><span class="o">.</span><span class="n">shape</span>
+<span class="n">sample</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">sample</span><span class="p">[</span><span class="s1">&#39;listing_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">sample_variables</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])]</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[170]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">sample_variables</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt output_prompt">Out[170]:</div>
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>(958, 226)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[171]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">X_sample</span> <span class="o">=</span> <span class="n">sample_variables</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+<span class="c1">#note y_test is the un-exponentiated price</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[172]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">new_predictions</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">new_predictions</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="mi">0</span><span class="p">:</span><span class="mi">7</span><span class="p">]</span><span class="o">=</span><span class="mi">0</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[173]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">new_predictions</span><span class="p">[</span><span class="s1">&#39;Mon&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">RidgeCV_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_sample</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+    <span class="n">new_predictions</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">RidgeCV_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_sample</span><span class="p">))</span><span class="o">*</span><span class="n">multiplier</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[174]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">new_predictions</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt output_prompt">Out[174]:</div>
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Mon</th>
+      <th>Tue</th>
+      <th>Wed</th>
+      <th>Thu</th>
+      <th>Fri</th>
+      <th>Sat</th>
+      <th>Sun</th>
+      <th>listing_id</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>875</th>
+      <td>38.752293</td>
+      <td>38.744570</td>
+      <td>38.745943</td>
+      <td>38.766520</td>
+      <td>39.939311</td>
+      <td>39.941000</td>
+      <td>38.788213</td>
+      <td>4526313.0</td>
+    </tr>
+    <tr>
+      <th>787</th>
+      <td>117.820157</td>
+      <td>117.796677</td>
+      <td>117.800850</td>
+      <td>117.863412</td>
+      <td>121.429096</td>
+      <td>121.434229</td>
+      <td>117.929366</td>
+      <td>2097795.0</td>
+    </tr>
+    <tr>
+      <th>2093</th>
+      <td>93.586445</td>
+      <td>93.567795</td>
+      <td>93.571110</td>
+      <td>93.620804</td>
+      <td>96.453083</td>
+      <td>96.457161</td>
+      <td>93.673192</td>
+      <td>3409586.0</td>
+    </tr>
+    <tr>
+      <th>2721</th>
+      <td>95.829400</td>
+      <td>95.810303</td>
+      <td>95.813698</td>
+      <td>95.864583</td>
+      <td>98.764742</td>
+      <td>98.768917</td>
+      <td>95.918226</td>
+      <td>3027838.0</td>
+    </tr>
+    <tr>
+      <th>2007</th>
+      <td>246.199927</td>
+      <td>246.150863</td>
+      <td>246.159585</td>
+      <td>246.290316</td>
+      <td>253.741256</td>
+      <td>253.751982</td>
+      <td>246.428133</td>
+      <td>2893512.0</td>
+    </tr>
+    <tr>
+      <th>1795</th>
+      <td>203.023346</td>
+      <td>202.982886</td>
+      <td>202.990078</td>
+      <td>203.097883</td>
+      <td>209.242137</td>
+      <td>209.250981</td>
+      <td>203.211531</td>
+      <td>4596378.0</td>
+    </tr>
+    <tr>
+      <th>1030</th>
+      <td>199.235418</td>
+      <td>199.195713</td>
+      <td>199.202771</td>
+      <td>199.308564</td>
+      <td>205.338181</td>
+      <td>205.346861</td>
+      <td>199.420092</td>
+      <td>5110.0</td>
+    </tr>
+    <tr>
+      <th>1623</th>
+      <td>134.245922</td>
+      <td>134.219168</td>
+      <td>134.223924</td>
+      <td>134.295208</td>
+      <td>138.357997</td>
+      <td>138.363845</td>
+      <td>134.370356</td>
+      <td>2563997.0</td>
+    </tr>
+    <tr>
+      <th>1662</th>
+      <td>163.660015</td>
+      <td>163.627400</td>
+      <td>163.633198</td>
+      <td>163.720101</td>
+      <td>168.673071</td>
+      <td>168.680201</td>
+      <td>163.811714</td>
+      <td>1814541.0</td>
+    </tr>
+    <tr>
+      <th>2089</th>
+      <td>151.812414</td>
+      <td>151.782160</td>
+      <td>151.787538</td>
+      <td>151.868150</td>
+      <td>156.462567</td>
+      <td>156.469181</td>
+      <td>151.953131</td>
+      <td>2500642.0</td>
+    </tr>
+    <tr>
+      <th>459</th>
+      <td>200.984900</td>
+      <td>200.944846</td>
+      <td>200.951966</td>
+      <td>201.058688</td>
+      <td>207.141251</td>
+      <td>207.150007</td>
+      <td>201.171195</td>
+      <td>4589825.0</td>
+    </tr>
+    <tr>
+      <th>696</th>
+      <td>136.855673</td>
+      <td>136.828400</td>
+      <td>136.833248</td>
+      <td>136.905918</td>
+      <td>141.047688</td>
+      <td>141.053650</td>
+      <td>136.982526</td>
+      <td>3083607.0</td>
+    </tr>
+    <tr>
+      <th>2557</th>
+      <td>83.278746</td>
+      <td>83.262150</td>
+      <td>83.265100</td>
+      <td>83.309321</td>
+      <td>85.829650</td>
+      <td>85.833278</td>
+      <td>83.355938</td>
+      <td>3617138.0</td>
+    </tr>
+    <tr>
+      <th>90</th>
+      <td>62.558593</td>
+      <td>62.546126</td>
+      <td>62.548342</td>
+      <td>62.581561</td>
+      <td>64.474820</td>
+      <td>64.477545</td>
+      <td>62.616580</td>
+      <td>4129195.0</td>
+    </tr>
+    <tr>
+      <th>284</th>
+      <td>192.350059</td>
+      <td>192.311726</td>
+      <td>192.318540</td>
+      <td>192.420677</td>
+      <td>198.241917</td>
+      <td>198.250296</td>
+      <td>192.528350</td>
+      <td>3933552.0</td>
+    </tr>
+    <tr>
+      <th>639</th>
+      <td>95.161885</td>
+      <td>95.142921</td>
+      <td>95.146292</td>
+      <td>95.196823</td>
+      <td>98.076781</td>
+      <td>98.080927</td>
+      <td>95.250092</td>
+      <td>3476547.0</td>
+    </tr>
+    <tr>
+      <th>730</th>
+      <td>188.260303</td>
+      <td>188.222785</td>
+      <td>188.229454</td>
+      <td>188.329419</td>
+      <td>194.026888</td>
+      <td>194.035089</td>
+      <td>188.434803</td>
+      <td>855549.0</td>
+    </tr>
+    <tr>
+      <th>424</th>
+      <td>963.908336</td>
+      <td>963.716243</td>
+      <td>963.750388</td>
+      <td>964.262220</td>
+      <td>993.433729</td>
+      <td>993.475722</td>
+      <td>964.801795</td>
+      <td>460876.0</td>
+    </tr>
+    <tr>
+      <th>700</th>
+      <td>75.860269</td>
+      <td>75.845152</td>
+      <td>75.847839</td>
+      <td>75.888120</td>
+      <td>78.183939</td>
+      <td>78.187244</td>
+      <td>75.930585</td>
+      <td>808851.0</td>
+    </tr>
+    <tr>
+      <th>517</th>
+      <td>254.820683</td>
+      <td>254.769901</td>
+      <td>254.778927</td>
+      <td>254.914236</td>
+      <td>262.626073</td>
+      <td>262.637174</td>
+      <td>255.056879</td>
+      <td>854521.0</td>
+    </tr>
+    <tr>
+      <th>331</th>
+      <td>196.991317</td>
+      <td>196.952060</td>
+      <td>196.959038</td>
+      <td>197.063640</td>
+      <td>203.025342</td>
+      <td>203.033924</td>
+      <td>197.173911</td>
+      <td>3343957.0</td>
+    </tr>
+    <tr>
+      <th>1442</th>
+      <td>228.355319</td>
+      <td>228.309811</td>
+      <td>228.317900</td>
+      <td>228.439156</td>
+      <td>235.350051</td>
+      <td>235.359999</td>
+      <td>228.566984</td>
+      <td>531465.0</td>
+    </tr>
+    <tr>
+      <th>1624</th>
+      <td>156.164181</td>
+      <td>156.133060</td>
+      <td>156.138592</td>
+      <td>156.221514</td>
+      <td>160.947633</td>
+      <td>160.954436</td>
+      <td>156.308932</td>
+      <td>794535.0</td>
+    </tr>
+    <tr>
+      <th>877</th>
+      <td>163.105295</td>
+      <td>163.072791</td>
+      <td>163.078569</td>
+      <td>163.165177</td>
+      <td>168.101360</td>
+      <td>168.108465</td>
+      <td>163.256480</td>
+      <td>2545705.0</td>
+    </tr>
+    <tr>
+      <th>1880</th>
+      <td>255.939409</td>
+      <td>255.888404</td>
+      <td>255.897470</td>
+      <td>256.033373</td>
+      <td>263.779067</td>
+      <td>263.790217</td>
+      <td>256.176642</td>
+      <td>533522.0</td>
+    </tr>
+    <tr>
+      <th>1238</th>
+      <td>162.085319</td>
+      <td>162.053018</td>
+      <td>162.058760</td>
+      <td>162.144827</td>
+      <td>167.050141</td>
+      <td>167.057202</td>
+      <td>162.235558</td>
+      <td>3414045.0</td>
+    </tr>
+    <tr>
+      <th>1277</th>
+      <td>68.122685</td>
+      <td>68.109109</td>
+      <td>68.111522</td>
+      <td>68.147695</td>
+      <td>70.209345</td>
+      <td>70.212313</td>
+      <td>68.185829</td>
+      <td>4069584.0</td>
+    </tr>
+    <tr>
+      <th>532</th>
+      <td>107.505026</td>
+      <td>107.483602</td>
+      <td>107.487410</td>
+      <td>107.544495</td>
+      <td>110.798003</td>
+      <td>110.802687</td>
+      <td>107.604674</td>
+      <td>63373.0</td>
+    </tr>
+    <tr>
+      <th>1179</th>
+      <td>56.328416</td>
+      <td>56.317191</td>
+      <td>56.319186</td>
+      <td>56.349097</td>
+      <td>58.053807</td>
+      <td>58.056261</td>
+      <td>56.380628</td>
+      <td>1807106.0</td>
+    </tr>
+    <tr>
+      <th>1110</th>
+      <td>113.959803</td>
+      <td>113.937092</td>
+      <td>113.941129</td>
+      <td>114.001641</td>
+      <td>117.450496</td>
+      <td>117.455460</td>
+      <td>114.065433</td>
+      <td>2495824.0</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>2595</th>
+      <td>124.528671</td>
+      <td>124.503855</td>
+      <td>124.508266</td>
+      <td>124.574390</td>
+      <td>128.343098</td>
+      <td>128.348524</td>
+      <td>124.644099</td>
+      <td>2896460.0</td>
+    </tr>
+    <tr>
+      <th>245</th>
+      <td>74.737371</td>
+      <td>74.722477</td>
+      <td>74.725124</td>
+      <td>74.764809</td>
+      <td>77.026645</td>
+      <td>77.029901</td>
+      <td>74.806646</td>
+      <td>394395.0</td>
+    </tr>
+    <tr>
+      <th>2006</th>
+      <td>209.697547</td>
+      <td>209.655757</td>
+      <td>209.663185</td>
+      <td>209.774534</td>
+      <td>216.120774</td>
+      <td>216.129910</td>
+      <td>209.891918</td>
+      <td>1891274.0</td>
+    </tr>
+    <tr>
+      <th>2220</th>
+      <td>308.054328</td>
+      <td>307.992937</td>
+      <td>308.003849</td>
+      <td>308.167425</td>
+      <td>317.490313</td>
+      <td>317.503734</td>
+      <td>308.339867</td>
+      <td>535237.0</td>
+    </tr>
+    <tr>
+      <th>2108</th>
+      <td>226.665090</td>
+      <td>226.619919</td>
+      <td>226.627948</td>
+      <td>226.748306</td>
+      <td>233.608049</td>
+      <td>233.617923</td>
+      <td>226.875189</td>
+      <td>534643.0</td>
+    </tr>
+    <tr>
+      <th>439</th>
+      <td>69.982093</td>
+      <td>69.968147</td>
+      <td>69.970626</td>
+      <td>70.007786</td>
+      <td>72.125709</td>
+      <td>72.128757</td>
+      <td>70.046960</td>
+      <td>1640610.0</td>
+    </tr>
+    <tr>
+      <th>285</th>
+      <td>194.862315</td>
+      <td>194.823482</td>
+      <td>194.830385</td>
+      <td>194.933856</td>
+      <td>200.831126</td>
+      <td>200.839616</td>
+      <td>195.042936</td>
+      <td>4851057.0</td>
+    </tr>
+    <tr>
+      <th>2011</th>
+      <td>124.541421</td>
+      <td>124.516602</td>
+      <td>124.521013</td>
+      <td>124.587144</td>
+      <td>128.356239</td>
+      <td>128.361664</td>
+      <td>124.656860</td>
+      <td>2273571.0</td>
+    </tr>
+    <tr>
+      <th>896</th>
+      <td>98.218541</td>
+      <td>98.198967</td>
+      <td>98.202446</td>
+      <td>98.254600</td>
+      <td>101.227064</td>
+      <td>101.231343</td>
+      <td>98.309581</td>
+      <td>1511792.0</td>
+    </tr>
+    <tr>
+      <th>2500</th>
+      <td>69.688370</td>
+      <td>69.674483</td>
+      <td>69.676951</td>
+      <td>69.713955</td>
+      <td>71.822989</td>
+      <td>71.826025</td>
+      <td>69.752965</td>
+      <td>3420223.0</td>
+    </tr>
+    <tr>
+      <th>495</th>
+      <td>300.878630</td>
+      <td>300.818670</td>
+      <td>300.829328</td>
+      <td>300.989093</td>
+      <td>310.094818</td>
+      <td>310.107926</td>
+      <td>301.157519</td>
+      <td>4721069.0</td>
+    </tr>
+    <tr>
+      <th>1465</th>
+      <td>89.222651</td>
+      <td>89.204870</td>
+      <td>89.208030</td>
+      <td>89.255407</td>
+      <td>91.955622</td>
+      <td>91.959509</td>
+      <td>89.305352</td>
+      <td>3218526.0</td>
+    </tr>
+    <tr>
+      <th>1858</th>
+      <td>121.313203</td>
+      <td>121.289027</td>
+      <td>121.293324</td>
+      <td>121.357741</td>
+      <td>125.029137</td>
+      <td>125.034422</td>
+      <td>121.425650</td>
+      <td>992186.0</td>
+    </tr>
+    <tr>
+      <th>545</th>
+      <td>150.195111</td>
+      <td>150.165180</td>
+      <td>150.170500</td>
+      <td>150.250253</td>
+      <td>154.795725</td>
+      <td>154.802268</td>
+      <td>150.334329</td>
+      <td>1641072.0</td>
+    </tr>
+    <tr>
+      <th>489</th>
+      <td>84.892775</td>
+      <td>84.875857</td>
+      <td>84.878865</td>
+      <td>84.923942</td>
+      <td>87.493119</td>
+      <td>87.496817</td>
+      <td>84.971463</td>
+      <td>1171955.0</td>
+    </tr>
+    <tr>
+      <th>690</th>
+      <td>186.237814</td>
+      <td>186.200700</td>
+      <td>186.207297</td>
+      <td>186.306188</td>
+      <td>191.942449</td>
+      <td>191.950562</td>
+      <td>186.410440</td>
+      <td>1354973.0</td>
+    </tr>
+    <tr>
+      <th>339</th>
+      <td>168.381440</td>
+      <td>168.347884</td>
+      <td>168.353849</td>
+      <td>168.443258</td>
+      <td>173.539117</td>
+      <td>173.546453</td>
+      <td>168.537515</td>
+      <td>4052512.0</td>
+    </tr>
+    <tr>
+      <th>1900</th>
+      <td>97.228839</td>
+      <td>97.209463</td>
+      <td>97.212907</td>
+      <td>97.264535</td>
+      <td>100.207048</td>
+      <td>100.211283</td>
+      <td>97.318962</td>
+      <td>1254486.0</td>
+    </tr>
+    <tr>
+      <th>856</th>
+      <td>265.823189</td>
+      <td>265.770214</td>
+      <td>265.779630</td>
+      <td>265.920781</td>
+      <td>273.965596</td>
+      <td>273.977176</td>
+      <td>266.069583</td>
+      <td>594036.0</td>
+    </tr>
+    <tr>
+      <th>2199</th>
+      <td>109.198900</td>
+      <td>109.177138</td>
+      <td>109.181007</td>
+      <td>109.238991</td>
+      <td>112.543762</td>
+      <td>112.548520</td>
+      <td>109.300118</td>
+      <td>666220.0</td>
+    </tr>
+    <tr>
+      <th>2304</th>
+      <td>201.525394</td>
+      <td>201.485233</td>
+      <td>201.492372</td>
+      <td>201.599381</td>
+      <td>207.698301</td>
+      <td>207.707081</td>
+      <td>201.712191</td>
+      <td>273517.0</td>
+    </tr>
+    <tr>
+      <th>1468</th>
+      <td>129.703205</td>
+      <td>129.677357</td>
+      <td>129.681951</td>
+      <td>129.750823</td>
+      <td>133.676133</td>
+      <td>133.681783</td>
+      <td>129.823428</td>
+      <td>4594790.0</td>
+    </tr>
+    <tr>
+      <th>2368</th>
+      <td>130.200762</td>
+      <td>130.174815</td>
+      <td>130.179427</td>
+      <td>130.248563</td>
+      <td>134.188930</td>
+      <td>134.194602</td>
+      <td>130.321447</td>
+      <td>4196252.0</td>
+    </tr>
+    <tr>
+      <th>1812</th>
+      <td>174.374409</td>
+      <td>174.339658</td>
+      <td>174.345835</td>
+      <td>174.438427</td>
+      <td>179.715656</td>
+      <td>179.723253</td>
+      <td>174.536038</td>
+      <td>3089150.0</td>
+    </tr>
+    <tr>
+      <th>1872</th>
+      <td>185.761633</td>
+      <td>185.724614</td>
+      <td>185.731194</td>
+      <td>185.829833</td>
+      <td>191.451682</td>
+      <td>191.459775</td>
+      <td>185.933818</td>
+      <td>795637.0</td>
+    </tr>
+    <tr>
+      <th>1876</th>
+      <td>56.134931</td>
+      <td>56.123744</td>
+      <td>56.125732</td>
+      <td>56.155540</td>
+      <td>57.854395</td>
+      <td>57.856841</td>
+      <td>56.186963</td>
+      <td>4137979.0</td>
+    </tr>
+    <tr>
+      <th>486</th>
+      <td>68.107981</td>
+      <td>68.094408</td>
+      <td>68.096821</td>
+      <td>68.132986</td>
+      <td>70.194191</td>
+      <td>70.197158</td>
+      <td>68.171111</td>
+      <td>1640836.0</td>
+    </tr>
+    <tr>
+      <th>2558</th>
+      <td>130.664818</td>
+      <td>130.638778</td>
+      <td>130.643407</td>
+      <td>130.712790</td>
+      <td>134.667201</td>
+      <td>134.672893</td>
+      <td>130.785933</td>
+      <td>4261951.0</td>
+    </tr>
+    <tr>
+      <th>723</th>
+      <td>203.265417</td>
+      <td>203.224909</td>
+      <td>203.232110</td>
+      <td>203.340043</td>
+      <td>209.491623</td>
+      <td>209.500478</td>
+      <td>203.453826</td>
+      <td>3935723.0</td>
+    </tr>
+    <tr>
+      <th>2469</th>
+      <td>175.677252</td>
+      <td>175.642242</td>
+      <td>175.648465</td>
+      <td>175.741749</td>
+      <td>181.058407</td>
+      <td>181.066060</td>
+      <td>175.840089</td>
+      <td>2830217.0</td>
+    </tr>
+  </tbody>
+</table>
+<p>958 rows × 8 columns</p>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[175]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1">#sample = results_multiplier.sample(frac=0.2,axis=0)</span>
+<span class="n">model_err</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">median_absolute_error</span><span class="p">(</span><span class="n">sample</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">new_predictions</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[176]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">model_err</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt output_prompt">Out[176]:</div>
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>72.1070818480257</pre>
 </div>
 
 </div>

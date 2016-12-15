@@ -11751,7 +11751,9 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Seasonality-Data-Cleaning">Seasonality Data Cleaning<a class="anchor-link" href="#Seasonality-Data-Cleaning">&#182;</a></h1><p>Data cleaning for Airbnb seasonality file.</p>
+<h1 id="1B.-Data-Cleaning:-Seasonality">1B. Data Cleaning: Seasonality<a class="anchor-link" href="#1B.-Data-Cleaning:-Seasonality">&#182;</a></h1><hr>
+
+<h3 id="Overall-Goal:">Overall Goal:<a class="anchor-link" href="#Overall-Goal:">&#182;</a></h3><p>The goal of this part of the cleaning is to get the dataset in a usable format. There were various challenges due to the csv containing commas in the pricing column, thus creating a problem with the number of columns for select entries (where the price is 1,000+). A lot of time had to be spent to recreating the csv in a usable format. Here we do this by using various strip and string concatenate functions and then outputting the correct file. Lastly, we see only a small subset of date don't have prices. It doesn't make much sense to predict those seasonality prices and then run a seasonality analysis. Given it is a small number of the overall entries, we drop the null values as so it doesn't cause errors with our seasonality analysis.</p>
 
 </div>
 </div>
@@ -11774,16 +11776,6 @@ div#notebook {
 </div>
 </div>
 
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Overall-Goal:">Overall Goal:<a class="anchor-link" href="#Overall-Goal:">&#182;</a></h2><p>The goal of this part of the cleaning is to get the dataset in a usable format. We ran into a lot of problems because our csv contained commas in the pricing column, thus creating a problem with the number of columns for select entires(where the price is 1,000+). A lot of time had to be spent to recreating the csv in a usable format. Here we do this by using various strip and string concatenate functions and then output the correct file. Lastly, we see ony a small subset of date don't have prices. It doesn't make much sense to predict those seasonality prices and then run a seasonality analysis. Given it is a small number of the overall entries, we drop the null values as so it doesn't cause errors with our seasonality analysis.</p>
-
-</div>
-</div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">

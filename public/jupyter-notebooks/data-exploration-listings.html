@@ -11751,14 +11751,14 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="2.-Data-Exploration">2. Data Exploration<a class="anchor-link" href="#2.-Data-Exploration">&#182;</a></h1><hr/>
+<h1 id="2A.-Data-Exploration:-Airbnb-Listings">2A. Data Exploration: Airbnb Listings<a class="anchor-link" href="#2A.-Data-Exploration:-Airbnb-Listings">&#182;</a></h1><hr/>
 
 <p>We will now explore the data to get a better understanding of the relationship between the observations as well as the relationship between each observation and predictor.</p>
 <ol>
 <li>Check for collinearity among the features</li>
 <li>Visualize relationship between each predictor and price</li>
 <li>Visualize the target variable to identify any skewness and any necessary transformations</li>
-<li>Visualize the supply of Airbnb homes by location and compute statistics for the average home in each region</li>
+<li>Visualize the supply of Airbnb homes by location</li>
 </ol>
 
 </div>
@@ -25133,7 +25133,7 @@ eDHJGGOMMcYYY4wxxjTN/wGltWxTuin1tAAAAABJRU5ErkJggg==
 <h3 id="Visualizations-by-Zipcode">Visualizations by Zipcode<a class="anchor-link" href="#Visualizations-by-Zipcode">&#182;</a></h3><p><hr>
 <img src="../img/zipcode-heat-map.jpg" alt="Zipcode Heat Map"></p>
 <p><img src="../img/zipcode-heat-map-zoom.jpg" alt="Zipcode Heat Map Zoomed In"></p>
-<p>We can see from the above graphic that the densest zipcodes tend to be in Manhattan with less and less dense zipcodes as you move away from here. The visualizations themselves are also clustered more together here. This makes sense as the circles are larger (representing more listings in the respective zipcode) and the physical land mass seems to be somewhat less in these zipcodes. This seems to match the population density of New York shown below(taken from <a href="https://www.arcgis.com/home/webmap/viewer.html?webmap=80f9b95a4ce0491091f1477710f6a91d">https://www.arcgis.com/home/webmap/viewer.html?webmap=80f9b95a4ce0491091f1477710f6a91d</a>). Because all of this fits so nicely together, we can confidently use location as a predictor without worrying too much about how location might skew our predictions. However, this does not mean that zipcode is the right way to represent location. We can cluster the zipcodes by neighborhood to see if this helps our prediction.</p>
+<h3 id="Analysis">Analysis<a class="anchor-link" href="#Analysis">&#182;</a></h3><p>We can see from the above graphic that the densest zipcodes tend to be in Manhattan / Brooklyn growing less and less dense as you move outside of Manhattan. In general, it seems that the majority of the data is concentrated in the Manhattan area, with less data in areas such as the Queens or Flushing. We can also cluster the zipcodes by neighborhood to see if this adds any statistical power to our models later on.</p>
 <p><img src="../img/population_density_NYC.jpg" alt="Population Density"></p>
 
 </div>
