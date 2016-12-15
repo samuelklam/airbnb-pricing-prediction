@@ -7,5 +7,5 @@ function includeContent(file) {
 }
 
 $(function() {
-    includeContent("jupyter-notebooks/data-exploration-listings.html");
+    includeContent("jupyter-notebooks/introduction.html");
 });
