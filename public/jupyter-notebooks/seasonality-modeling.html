@@ -11751,7 +11751,7 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="3B.-Data-Modeling:-Seasonality">3B. Data Modeling: Seasonality<a class="anchor-link" href="#3B.-Data-Modeling:-Seasonality">&#182;</a></h1>
+<h1 id="3B.-Data-Modeling:-Seasonality">3B. Data Modeling: Seasonality<a class="anchor-link" href="#3B.-Data-Modeling:-Seasonality">&#182;</a></h1><hr>
 </div>
 </div>
 </div>
@@ -12292,7 +12292,7 @@ div#notebook {
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Overall, our results did suffer from greater error than our original RidgeCV regression, as we experience a median absolute error of $\$72.10$. We came to our predictions by using our RidgeCV to predict an average price for our sample of the total listings( we used $40\%$ of the total dataset to help it run faster). Then, we multiplied that average by the appropriate day multiplier to predict the price by day of the week. Lastly, we looked at the errors this generated versus the actual prices by day of the week that we know. This is for three reasons-- many of the listings still do not incorporate day-variations in their prices, large rather than small price difference between days of the week, and inaccuracies within the original RidgeCV predictions.
-To address the first inaccuracy, we see that most of the listings don't vary prices over time. This can be seen by the extremely clean averages that are the same each day for every listing. This is strongly suggestive that the lister just uses one set price no matter what time of the year it is. If there were some variation, then the averages would be a lot more messy. This directly leads to the second point. Because so many people do not use dynamic, day-based pricing, the overall effect we see and apply is very minimal (with a max of $103\%$ on Friday and Saturday as we said earlier). However, when we look at the strategies of people who do employ dynamic pricing, the price changes are never $3\%$. For example, we see ID 3409586 increases its average listing price from $\$75$ $\$95$ on Fridays and Saturdays. Thus, even for listings that do use dynamic pricing, the multipliers we applied are less than the shifts in prices actually used. Latly, a lot of the error here is in predicting the average price from our RidgeCV regression. In the future, by better predicting the average price, it will also dramatically increase the accuracy of our seasonality analysis. However, all in all this was a great step forward.</p>
+To address the first inaccuracy, we see that most of the listings don't vary prices over time. This can be seen by the extremely clean averages that are the same each day for every listing. This is strongly suggestive that the lister just uses one set price no matter what time of the year it is. If there were some variation, then the averages would be a lot more messy. This directly leads to the second point. Because so many people do not use dynamic, day-based pricing, the overall effect we see and apply is very minimal (with a max of $103\%$ on Friday and Saturday as we said earlier). However, when we look at the strategies of people who do employ dynamic pricing, the price changes are never $3\%$. For example, we see ID 3409586 increases its average listing price from \$75 to \$95 on Fridays and Saturdays. Thus, even for listings that do use dynamic pricing, the multipliers we applied are less than the shifts in prices actually used. Lastly, a lot of the error here is in predicting the average price from our RidgeCV regression. In the future, by better predicting the average price, it will also dramatically increase the accuracy of our seasonality analysis. However, all in all this was a great step forward.</p>
 
 </div>
 </div>
@@ -12353,7 +12353,7 @@ To address the first inaccuracy, we see that most of the listings don't vary pri
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><img src="../img/1 difference.png" width="400"></p>
 <p>This looks a lot better so then we can look at the ACF and PACF graphs to estimate the parameters of the ARIMA model. The ACF supports our analysis from the averages in that there is high autocorrelation in the multiples of lag=7.</p>
-<p><img src="../img/ACF.png" width="400">
+<p><img src="../img/acf.png" width="400">
 <img src="../img/PACF.png" width="400"></p>
 <p>Lastly, we use the forecast package in R to have it choose the best model based on lowest AIC. We ultimately come up with a model of ARIMA(4,0,3) as highlighted by this output from R
 <img src="../img/arima model.png" width="400"></p>
