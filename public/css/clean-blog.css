@@ -399,3 +399,10 @@ img::-moz-selection {
 body {
   -webkit-tap-highlight-color: #0085A1;
 }
+.custom-form-control  {
+  text-align: center !important;
+  border-top: none !important;
+}
+.read_me_bullet {
+ color: #0090ff !important;
+}
