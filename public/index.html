@@ -84,7 +84,14 @@
         </table>
     </form>
 
-    <div id="includedContent"></div>
+    <!-- Load in Jupyter Notebooks HTML pages here -->
+    <div>
+        <style scoped>
+            p {color: blue}
+        </style>
+        <div id="includedContent">
+        </div>
+    </div>
 
     <br>
     <br>
@@ -120,6 +127,12 @@
 
     <!-- jQuery -->
     <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/jquery/jquery.scoped.js"></script>
+    <script>
+        $(document).ready(function() {
+            $.scoped();
+        });
+    </script>
 
     <!-- Bootstrap Core JavaScript -->
     <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
