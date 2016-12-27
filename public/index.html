@@ -24,7 +24,7 @@
 
     <!-- jQuery -->
     <script src="vendor/jquery/jquery.min.js"></script>
-    <script src="vendor/jquery/jquery.scoped.js"></script>
+    <script src="http://thomaspark.github.io/scoper/scoper.js"></script>
 
     <!-- Load JS Scripts -->
     <script src="js/nav-footer.js"></script>
@@ -95,7 +95,7 @@
             <tbody>
                 <tr>
                     <td class="custom-form-control">Site Navigation:
-                        <select id="botnav" class="custom-form-control" onchange="includeContent(this.options[this.selectedIndex].value);document.getElementById('botnav').options[this.options.selectedIndex].selected = true;">
+                        <select id="botnav" class="custom-form-control" onchange="includeContent(this.options[this.selectedIndex].value);document.getElementById('topnav').options[this.options.selectedIndex].selected = true;">
                             <option value="jupyter-notebooks/introduction.html">Introduction</option>
                             <option value="jupyter-notebooks/data-cleaning-listings.html">1A. Data Cleaning: Airbnb Listings</option>
                             <option value="jupyter-notebooks/seasonality-cleaning-WJ.html">1B. Data Cleaning: Seasonality</option>
