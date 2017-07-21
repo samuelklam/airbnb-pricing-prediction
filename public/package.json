@@ -1,6 +1,7 @@
 {
   "name": "Airbnb-Pricing-Prediction",
   "title": "Airbnb Pricing Prediction",
+  "version": "8.1.4",
   "homepage": "https://airbnb-pricing-prediction.herokuapp.com/index.html",
   "author": "Samuel Lam",
   "license": {
