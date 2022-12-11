@@ -1,6 +1,6 @@
 # Airbnb Pricing Predictions
 
-A Statistical Model to predict the optimal Airbnb Listing price in NYC given listing information (e.g. bedrooms, type of bed, location, ratings) and taking into account seasonality data. Deployed at https://airbnb-pricing-prediction.herokuapp.com/.
+A Statistical Model to predict the optimal Airbnb Listing price in NYC given listing information (e.g. bedrooms, type of bed, location, ratings) and taking into account seasonality data. Deployed at https://airbnb-pricing-prediction.onrender.com/.
 
 ## Data Sources
 - [Inside Airbnb Data 2015 Listing Data](http://data.beta.nyc/dataset/inside­airbnb­data/resource/9d64399b­36d6­40a9­b0bb­f26ae0d9c53f)
